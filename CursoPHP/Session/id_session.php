@@ -7,4 +7,5 @@ echo "id da pagina: " . session_id();
 session_regenerate_id();
 
 echo "<br> novo Id: " . session_id();
+
 ?>
