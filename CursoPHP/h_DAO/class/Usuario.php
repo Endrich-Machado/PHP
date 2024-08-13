@@ -1,0 +1,87 @@
+<?php
+
+class Usuario
+{
+    private
+        $idUsuario,
+        $user,
+        $password,
+        $dtCreateUser;
+
+    private function getIdUsario()
+    {
+        return $this->idUsuario;
+    }
+
+    private function setIdUsario($id)
+    {
+        $this->idUsuario = $id;
+    }
+
+    private function getUser()
+    {
+        return $this->user;
+    }
+
+    private function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    private function getPassword()
+    {
+        return $this->password;
+    }
+
+
+    private function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    private function getDtCreateUser()
+    {
+        return $this->dtCreateUser;
+    }
+
+    private function setDtCreateUser($value)
+    {
+        $this->dtCreateUser = $value;
+    }
+
+
+    public function loadUser($id)
+    {
+
+        $selectList = new Sql();
+        $result = $selectList->select("SELECT * FROM usuario WHERE idUsuario = :ID ", array(":ID" => $id));
+
+        if (isset($result)) {
+
+            $rows = $result[0];
+            $this->setIdUsario($rows["idUsuario"]);
+            $this->setUser($rows["user"]);
+            $this->setPassword($rows["password"]);
+            $this->setDtCreateUser($rows["dtcreateUser"]);
+        }
+    }
+
+    public function loadList()
+    {
+        $sql = new Sql();
+
+        return json_encode($usuarios = $sql->select("SELECT * FROM usuario"));
+    }
+
+    public function __toString()
+    {
+        return json_encode(
+            array(
+                $this->getIdUsario(),
+                $this->getUser(),
+                $this->getPassword(),
+                $this->getDtCreateUser()
+            )
+        );
+    }
+}
