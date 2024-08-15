@@ -50,19 +50,23 @@ class Usuario
     }
 
 
-    public function loadUser($id)
+    public function loadUser($user, $password)
     {
 
         $selectList = new Sql();
-        $result = $selectList->select("SELECT * FROM usuario WHERE idUsuario = :ID ", array(":ID" => $id));
-
-        if (isset($result)) {
-
+        $result = $selectList->select("SELECT * FROM usuario WHERE user = :USER AND password = :PASSWORD",
+         array
+         (":USER" => $user,
+          ":PASSWORD" => $password
+         ));
+        if (count($result)>0) {
             $rows = $result[0];
             $this->setIdUsario($rows["idUsuario"]);
             $this->setUser($rows["user"]);
             $this->setPassword($rows["password"]);
             $this->setDtCreateUser($rows["dtcreateUser"]);
+        }else{
+            throw new Exception("lOGIN e/ou SENHA inválidos");
         }
     }
 
@@ -70,7 +74,14 @@ class Usuario
     {
         $sql = new Sql();
 
-        return json_encode($usuarios = $sql->select("SELECT * FROM usuario"));
+        return json_encode($usuarios = $sql->select("SELECT * FROM usuario order by idUsuario;"));
+    }
+
+    public static function search($login){
+        $sql = new Sql();
+
+        return $sql->select("SELECT * FROM usuario WHERE user  LIKE :search ORDER BY idUsuario", array(
+            ':search' => "%".$login."%"));
     }
 
     public function __toString()
