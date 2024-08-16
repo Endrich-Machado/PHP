@@ -7,10 +7,16 @@ require_once("config.php");
 // echo $user2
 
 
-$aluno = new Usuario("Date", "14/02/1990");
+// $aluno = new Usuario("Date", "14/02/1990");
 
 
-$aluno->insert();
+// $aluno->insert();
 
-echo $aluno;
+// echo $aluno;
+
+
+ $usuario = new Usuario();
+// $usuario->update("12@@", "112654Nife", 18)
+$usuario->delete(14);
+echo $usuario->loadList();
 ?>

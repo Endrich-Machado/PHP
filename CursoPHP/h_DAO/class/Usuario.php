@@ -13,7 +13,7 @@ class Usuario
         return $this->idUsuario;
     }
 
-    private function setIdUsario($id)
+    public function setIdUsario($id)
     {
         $this->idUsuario = $id;
     }
@@ -32,7 +32,7 @@ class Usuario
     {
         return $this->password;
     }
-    public function __construct($user, $password)
+    public function __construct($user ="", $password="")
     {
         $calendar = new DateTime();
         $this->setUser($user);
@@ -64,18 +64,7 @@ class Usuario
     }
 
 
-    public function insert(){
-        $newInsert = new Sql();
-        $result =$newInsert->select("CALL sp_usuario_insert(:LOGIN, :SENHA, :DATA)",array(
-            ':LOGIN'=>$this->getUser(),
-            ':SENHA'=>$this->getPassword(),
-            ':DATA' => $this->getDtCreateUser()
-        ));
-
-        if (count($result)>0) {
-            $this->setData($result[0]);
-        }
-    }
+    
     public function loadUser($user, $password)
     {
 
@@ -117,5 +106,49 @@ class Usuario
                 $this->getDtCreateUser()
             )
         );
+    }
+
+
+    public function insert(){
+        $newInsert = new Sql();
+        $result =$newInsert->select("CALL sp_usuario_insert(:LOGIN, :SENHA, :DATA)",array(
+            ':LOGIN'=>$this->getUser(),
+            ':SENHA'=>$this->getPassword(),
+            ':DATA' => $this->getDtCreateUser()
+        ));
+
+        if (count($result)>0) {
+            $this->setData($result[0]);
+        }
+    }
+
+    public function update($login, $pasword, $id){
+
+        $this->setUser($login);
+        $this->setPassword($pasword);
+        $this->setIdUsario($id);
+        $sql= new Sql();
+        $calendar = new DateTime();
+        $this->setDtCreateUser($calendar->format("d/m/Y"));
+
+        $sql->select("UPDATE usuario set user = :LOGIN, password = :PASSWORD, dtcreateUser = :DATA WHERE idUsuario = :ID", 
+        array
+        (
+            ':LOGIN'=>$this->getUser(),
+            ':PASSWORD'=>$this->getPassword(),
+            ':DATA'=>$this->getDtCreateUser(), 
+            ':ID' => $this->getIdUsario()
+        ));
+
+
+    }
+
+    public function delete($idUsuario){
+        $this->setIdUsario($idUsuario);
+        $sql = new Sql();
+        $sql->select("DELETE FROM usuario WHERE idUsuario = :ID", array(
+            ':ID' =>$this->getIdUsario()
+        ));
+
     }
 }
