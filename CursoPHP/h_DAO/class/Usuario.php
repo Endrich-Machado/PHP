@@ -23,7 +23,7 @@ class Usuario
         return $this->user;
     }
 
-    private function setUser($user)
+    public function setUser($user)
     {
         $this->user = $user;
     }
@@ -32,9 +32,15 @@ class Usuario
     {
         return $this->password;
     }
+    public function __construct($user, $password)
+    {
+        $calendar = new DateTime();
+        $this->setUser($user);
+        $this->setPassword($password);
+        $this->setDtCreateUser($calendar->format("d/m/Y"));
+    }
 
-
-    private function setPassword($password)
+    public function setPassword($password)
     {
         $this->password = $password;
     }
@@ -48,8 +54,28 @@ class Usuario
     {
         $this->dtCreateUser = $value;
     }
+    public function setData($data){
+        $calendar = new DateTime();
+        
+        $this->setIdUsario($data["idUsuario"]);
+        $this->setUser($data["user"]);
+        $this->setPassword($data["password"]);
+        $this->setDtCreateUser("dia" . $calendar->format("d/m/Y"));
+    }
 
 
+    public function insert(){
+        $newInsert = new Sql();
+        $result =$newInsert->select("CALL sp_usuario_insert(:LOGIN, :SENHA, :DATA)",array(
+            ':LOGIN'=>$this->getUser(),
+            ':SENHA'=>$this->getPassword(),
+            ':DATA' => $this->getDtCreateUser()
+        ));
+
+        if (count($result)>0) {
+            $this->setData($result[0]);
+        }
+    }
     public function loadUser($user, $password)
     {
 
@@ -60,11 +86,7 @@ class Usuario
           ":PASSWORD" => $password
          ));
         if (count($result)>0) {
-            $rows = $result[0];
-            $this->setIdUsario($rows["idUsuario"]);
-            $this->setUser($rows["user"]);
-            $this->setPassword($rows["password"]);
-            $this->setDtCreateUser($rows["dtcreateUser"]);
+            $this->setData($result[0]);
         }else{
             throw new Exception("lOGIN e/ou SENHA inválidos");
         }
@@ -77,12 +99,13 @@ class Usuario
         return json_encode($usuarios = $sql->select("SELECT * FROM usuario order by idUsuario;"));
     }
 
-    public static function search($login){
+    public static function search($nomeDeUsuario){
         $sql = new Sql();
 
         return $sql->select("SELECT * FROM usuario WHERE user  LIKE :search ORDER BY idUsuario", array(
-            ':search' => "%".$login."%"));
+            ':search' => "%".$nomeDeUsuario."%"));
     }
+
 
     public function __toString()
     {
